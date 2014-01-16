@@ -105,7 +105,7 @@ exec { 'mysql-root-password':
 }
 
 exec { 'mysql-root-create-xhprof-db':
-	command => '/usr/bin/mysql -uroot -pvagrant -e "create database xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
+	command => '/usr/bin/mysql -uroot -pvagrant -e "create database if not exists xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
 	require => Exec['mysql-root-password'],
 }
 
