@@ -166,6 +166,11 @@ package { 'php5-dev':
 	require => Exec['apt-get update final'],
 }
 
+package { 'php5-xdebug':
+	ensure => installed,
+	require => Exec['apt-get update final'],
+}
+
 exec { 'install_xhprof':
     command => '/usr/bin/pecl install -f xhprof',
     require => Package['php5-dev'],
