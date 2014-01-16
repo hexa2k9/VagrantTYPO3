@@ -114,16 +114,24 @@ exec { 'mysql-root-import-xhprof-db':
 	require => Exec['mysql-root-create-xhprof-db'],
 }
 
-
-
 # ---------------------------------------------------
-# Install PHP 5.5.x with FPM
+# Install Cache Servers
 # ---------------------------------------------------
 
 package { 'memcached':
 	ensure => installed,
 	require => Exec['apt-get update final'],
 }
+
+package { 'redis-server':
+	ensure => installed,
+	require => Exec['apt-get update final'],
+}
+
+
+# ---------------------------------------------------
+# Install PHP 5.5.x with FPM
+# ---------------------------------------------------
 
 package { 'php5-fpm':
 	ensure => installed,
@@ -155,12 +163,14 @@ package { 'php5-cli':
 	ensure => installed,
 	require => Exec['apt-get update final'],
 }
-
 package { 'php5-memcache':
 	ensure => installed,
 	require => Exec['apt-get update final'],
 }
-
+package { 'php5-redis':
+	ensure => installed,
+	require => Exec['apt-get update final'],
+}
 package { 'php5-dev':
 	ensure => installed,
 	require => Exec['apt-get update final'],
