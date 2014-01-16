@@ -74,6 +74,7 @@ What it contains:
 - PHP 5.5.x
 - Nginx 1.4.x with mass host config
 - Memchached
+- Redis Server
 - nano-Editor
 - git and tig
 - Composer (installed + kept up to date)
