@@ -78,6 +78,7 @@ What it contains:
 - git and tig
 - Composer (installed + kept up to date)
 - XHProf including XHProf.io Web Gui pre installed running at xhprof.io.lo on the guest system
+- [Xdebug](http://xdebug.org/) 
 
 
 TODO:
