@@ -1,4 +1,0 @@
-mysql -uroot -pvagrant -e'create database sharegroundtypo3 CHARACTER SET utf8 COLLATE utf8_general_ci;';
-mysql -uroot -pvagrant -e'create database sharegroundprod CHARACTER SET utf8 COLLATE utf8_general_ci;';
-mysql -uroot -pvagrant sharegroundprod < /var/www/sharegroundtypo3.sql ;
-mysql -uroot -pvagrant sharegroundtypo3 < /var/www/sharegroundtypo3.sql ;
