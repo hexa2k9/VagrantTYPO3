@@ -14,7 +14,7 @@ CONFIG_FILE="/etc/hhvm/server.hdf"
 ## Examples:
 ##   "hhvm"   Custom 'hhvm' user
 ##   "nobody" RHEL/CentOS 'www-data' equivalent
-RUN_AS_USER="www-data"
+RUN_AS_USER="vagrant"
 
 ## Listen port of service.
 ## This is useful if the port is used by an other service like PHP-FPM.
