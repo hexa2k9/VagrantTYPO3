@@ -235,8 +235,9 @@ package { 'php5-xdebug':
 exec { 'install_xhprof':
 	command => '/usr/bin/pecl install -f xhprof',
 	require => Package['php5-dev'],
-	creates => '/usr/lib/php5/20121212/xhprof.so',
-	unless => '/usr/bin/test -f /usr/lib/php5/20121212/xhprof.so'
+	notify => Service['php5-fpm'],
+#	creates => '/usr/lib/php5/20121212/xhprof.so',
+#	unless => '/usr/bin/test -f /usr/lib/php5/20121212/xhprof.so'
 }
 
 package { 'graphviz':
