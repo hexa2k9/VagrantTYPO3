@@ -42,15 +42,15 @@ Boot up the virtual box:
 
 	vagrant up
 
-The box gets one static IP addresses **192.150.50.50** which is only accessible from your local computer.
+The box gets one static IP addresses **192.168.50.50** which is only accessible from your local computer.
 
-Now add any project you're working on (e.g. "example.com") to your hosts file and let it point to 192.150.50.50 and create a directory with the domain name within the sub-directory "vHosts". As soon as you call that domain from your browser, you should see it working.
+Now add any project you're working on (e.g. "example.com") to your hosts file and let it point to 192.168.50.50 and create a directory with the domain name within the sub-directory "vHosts". As soon as you call that domain from your browser, you should see it working.
 
 The IP addresse is for  Nginx - this means you can direct the request the webserver via your hosts file entry:
 
-* Nginx listens on 192.150.50.50 on port 80
+* Nginx listens on 192.168.50.50 on port 80
 
-For name resolution from within the guest system lookups to *.dev, *.prod and *.lo it will always result in the IP of Nginx (192.150.50.50).
+For name resolution from within the guest system lookups to *.dev, *.prod and *.lo it will always result in the IP of Nginx (192.168.50.50).
 
 If you're running a [TYPO3 Flow](http://flow.typo3.org/) based web-application where the document-root must point to a sub-directory (e.g. /Web/), you can solve this with a little symlink as shown in the following (pseudo) directory listing:
 
