@@ -182,8 +182,9 @@ package { 'php5-xdebug':
 }
 
 exec { 'install_xhprof':
-    command => '/usr/bin/pecl install -f xhprof',
-    require => Package['php5-dev'],
+	command => '/usr/bin/pecl install -f xhprof',
+	require => Package['php5-dev'],
+	notify => Service['php5-fpm'],
   }
 
 package { ['graphviz']:
