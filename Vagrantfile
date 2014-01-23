@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
 
 	config.vm.network :private_network, ip: "192.168.50.50"
 
-	config.vm.synced_folder "vHosts/", "/var/www/", type: "nfs", owner: "www-data", group: "www-data"
+	config.vm.synced_folder "vHosts/", "/var/www/", id: "vagrant-root", :nfs => true
 
 	# configure the VM via Puppet
 	config.vm.provision :puppet
