@@ -67,18 +67,24 @@ package { "python-software-properties":
 }
 
 exec { 'adding new nginx':
-	command => '/usr/bin/sudo add-apt-repository -y "deb http://nginx.org/packages/ubuntu/ precise nginx"',
-	require => Package['python-software-properties']
+	command => '/usr/bin/sudo echo "deb http://nginx.org/packages/ubuntu/ precise nginx" > /etc/apt/sources.list.d/nginx.list',
+	creates => '/etc/apt/sources.list.d/nginx.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/nginx.list',
 }
 
 exec { 'adding ppa:ondrej/php5':
 	command => '/usr/bin/sudo add-apt-repository -y ppa:ondrej/php5',
-	require => Package['python-software-properties']
+	creates => '/etc/apt/sources.list.d/ondrej-php5-precise.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/ondrej-php5-precise.list'
 }
 
 exec { 'adding hhvm sources.list':
 	command => '/usr/bin/sudo echo "deb http://dl.hhvm.com/ubuntu precise main" > /etc/apt/sources.list.d/hhvm.list',
-	require => Package['python-software-properties']
+	creates => '/etc/apt/sources.list.d/hhvm.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
 }
 
 exec { 'apt-get update final':
@@ -227,8 +233,10 @@ package { 'php5-xdebug':
 }
 
 exec { 'install_xhprof':
-    command => '/usr/bin/pecl install -f xhprof',
-    require => Package['php5-dev'],
+	command => '/usr/bin/pecl install -f xhprof',
+	require => Package['php5-dev'],
+	creates => '/usr/lib/php5/20121212/xhprof.so',
+	unless => '/usr/bin/test -f /usr/lib/php5/20121212/xhprof.so'
 }
 
 package { 'graphviz':
