@@ -41,17 +41,17 @@ package { 'tig':
   require => Exec['aptitude upgrade'],
 }
 
-exec { "Import repo signing key to apt keys":
-  path   => "/usr/bin:/usr/sbin:/bin",
-  command     => "apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C",
-  unless      => "apt-key list | grep E5267A6C",
+exec { 'Import repo signing key to apt keys':
+  path   => '/usr/bin:/usr/sbin:/bin',
+  command     => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C',
+  unless      => 'apt-key list | grep E5267A6C',
   require => Exec['aptitude upgrade'],
 }
 
-exec { "Import repo signing key to apt keys 2":
-  path   => "/usr/bin:/usr/sbin:/bin",
-  command     => "apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ABF5BD827BD9BF62",
-  unless      => "apt-key list | grep ABF5BD827BD9BF62",
+exec { 'Import repo signing key to apt keys 2':
+  path   => '/usr/bin:/usr/sbin:/bin',
+  command     => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ABF5BD827BD9BF62',
+  unless      => 'apt-key list | grep ABF5BD827BD9BF62',
   require => Exec['aptitude upgrade'],
 }
 
@@ -60,7 +60,7 @@ exec { 'apt-get update':
   require => Exec['aptitude upgrade'],
 }
 
-package { "python-software-properties":
+package { 'python-software-properties':
   ensure => present,
   require => Exec['apt-get update'],
 }
@@ -87,7 +87,7 @@ exec { 'apt-get update final':
 # ---------------------------------------------------
 # Install MySQL
 # ---------------------------------------------------
-package { "mysql-server":
+package { 'mysql-server':
   ensure => present,
   require => Exec['apt-get update final'],
 }
@@ -97,17 +97,17 @@ service { 'mysql':
   hasstatus => true,
   hasrestart => true,
   enable => true,
-  require => Package["mysql-server"],
+  require => Package['mysql-server'],
 }
 
 exec { 'mysql-root-password':
   command => '/usr/bin/mysqladmin -u root password vagrant',
-  onlyif => '/usr/bin/mysql -u root mysql -e "show databases;"',
+  onlyif => '/usr/bin/mysql -u root mysql -e "SHOW DATABASES;"',
   require => Package['mysql-server'],
 }
 
 exec { 'mysql-root-create-xhprof-db':
-  command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
+  command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;"',
   require => Exec['mysql-root-password'],
 }
 
@@ -206,14 +206,14 @@ service { 'php5-fpm':
 
 file { '/etc/php5/fpm/pool.d/www.conf':
   ensure => present,
-  source => "/vagrant/manifests/files/php/www.conf",
+  source => '/vagrant/manifests/files/php/www.conf',
   require => Package['php5-fpm'],
   notify => Service['php5-fpm']
 }
 
 file { '/etc/php5/fpm/conf.d/90-vagrant.ini':
   ensure => present,
-  source => "/vagrant/manifests/files/php/90-vagrant.ini",
+  source => '/vagrant/manifests/files/php/90-vagrant.ini',
   require => Package['php5-fpm'],
   notify => Service['php5-fpm'],
 }
@@ -240,14 +240,14 @@ exec { 'install-composer':
 
 exec { 'selfupdate-composer':
   command => 'sudo composer self-update',
-  path => "/usr/local/bin/:/usr/bin/",
+  path => '/usr/local/bin/:/usr/bin/',
   require => Exec['install-composer']
 }
 
 # ---------------------------------------------------
 # Install Nginx
 # ---------------------------------------------------
-package { "nginx":
+package { 'nginx':
   ensure => present,
   require => Exec['apt-get update final']
 }
@@ -270,7 +270,7 @@ service { 'nginx':
 # ----------------------------------------------------
 # ImageMagick
 # ----------------------------------------------------
-package{"imagemagick":
+package{'imagemagick':
   ensure => present,
   require => Exec['apt-get update final'],
 }
