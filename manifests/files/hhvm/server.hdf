@@ -1,6 +1,8 @@
-PidFile = /tmp/hhvm.pid
+PidFile = /var/run/hhvm/hhvm.pid
 
 Server {
+  Port = 9900
+  Type = fastcgi
   SourceRoot = /var/www/hhvm/Web
   DefaultDocument = index.php
 }

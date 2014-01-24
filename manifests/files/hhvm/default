@@ -7,14 +7,14 @@
 ## Default: "/etc/hhvm/server.hdf"
 ## Examples:
 ##   "/etc/hhvm/conf.d/fastcgi.hdf" Load configuration file from Debian/Ubuntu conf.d style location
-CONFIG_FILE="/etc/hhvm/server.hdf"
+#CONFIG_FILE="/etc/hhvm/server.hdf"
 
 ## User to run the service as.
 ## Default: "www-data"
 ## Examples:
 ##   "hhvm"   Custom 'hhvm' user
 ##   "nobody" RHEL/CentOS 'www-data' equivalent
-RUN_AS_USER="www-data"
+#RUN_AS_USER="www-data"
 
 ## Listen port of service.
 ## This is useful if the port is used by an other service like PHP-FPM.
@@ -30,4 +30,4 @@ LISTEN_PORT="9900"
 
 ## PID file location.
 ## Default: "/var/run/hhvm/hhvm-fastcgi.pid"
-PIDFILE="/tmp/hhvm-fastcgi.pid"
+#PIDFILE="/var/run/hhvm/hhvm-fastcgi.pid"

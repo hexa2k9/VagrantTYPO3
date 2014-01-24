@@ -41,6 +41,11 @@ package { 'tig':
   require => Exec['aptitude upgrade'],
 }
 
+package { 'python-software-properties':
+  ensure => present,
+  require => Exec['apt-get update'],
+}
+
 exec { 'Import repo signing key to apt keys':
   path   => '/usr/bin:/usr/sbin:/bin',
   command     => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C',
@@ -56,9 +61,9 @@ exec { 'Import repo signing key to apt keys 2':
 }
 
 exec { "Import repo signing key to apt keys 3":
-	path   => "/usr/bin:/usr/sbin:/bin",
-	command     => "wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -",
-	require => Exec['aptitude upgrade'],
+  path   => "/usr/bin:/usr/sbin:/bin",
+  command     => "wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -",
+  require => Exec['aptitude upgrade'],
 }
 
 exec { 'apt-get update':
@@ -66,30 +71,25 @@ exec { 'apt-get update':
   require => Exec['aptitude upgrade'],
 }
 
-package { 'python-software-properties':
-  ensure => present,
-  require => Exec['apt-get update'],
-}
-
 exec { 'adding new nginx':
-	command => '/usr/bin/sudo echo "deb http://nginx.org/packages/ubuntu/ precise nginx" > /etc/apt/sources.list.d/nginx.list',
-	creates => '/etc/apt/sources.list.d/nginx.list',
-	require => Package['python-software-properties'],
-	unless => '/usr/bin/test -f /etc/apt/sources.list.d/nginx.list',
+  command => '/usr/bin/sudo echo "deb http://nginx.org/packages/ubuntu/ precise nginx" > /etc/apt/sources.list.d/nginx.list',
+  creates => '/etc/apt/sources.list.d/nginx.list',
+  require => Package['python-software-properties'],
+  unless => '/usr/bin/test -f /etc/apt/sources.list.d/nginx.list',
 }
 
 exec { 'adding ppa:ondrej/php5':
   command => '/usr/bin/sudo add-apt-repository -y ppa:ondrej/php5',
-	creates => '/etc/apt/sources.list.d/ondrej-php5-precise.list',
-	require => Package['python-software-properties'],
-	unless => '/usr/bin/test -f /etc/apt/sources.list.d/ondrej-php5-precise.list'
+  creates => '/etc/apt/sources.list.d/ondrej-php5-precise.list',
+  require => Package['python-software-properties'],
+  unless => '/usr/bin/test -f /etc/apt/sources.list.d/ondrej-php5-precise.list'
 }
 
 exec { 'adding hhvm sources.list':
-	command => '/usr/bin/sudo echo "deb http://dl.hhvm.com/ubuntu precise main" > /etc/apt/sources.list.d/hhvm.list',
-	creates => '/etc/apt/sources.list.d/hhvm.list',
-	require => Package['python-software-properties'],
-	unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
+  command => '/usr/bin/sudo echo "deb http://dl.hhvm.com/ubuntu precise main" > /etc/apt/sources.list.d/hhvm.list',
+  require => Package['python-software-properties'],
+#  creates => '/etc/apt/sources.list.d/hhvm.list',
+#  unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
 }
 
 exec { 'apt-get update final':
@@ -97,8 +97,8 @@ exec { 'apt-get update final':
   require => [
     Package['python-software-properties'],
     Exec['adding new nginx'],
-    Exec['adding ppa:ondrej/php5']
-		Exec['adding hhvm sources.list'],
+    Exec['adding ppa:ondrej/php5'],
+    Exec['adding hhvm sources.list']
   ]
 }
 
@@ -107,7 +107,7 @@ exec { 'apt-get update final':
 # ---------------------------------------------------
 package { 'mysql-server':
   ensure => present,
-  require => Exec['apt-get update final'],
+  require => Exec['apt-get update final']
 }
 
 service { 'mysql':
@@ -115,7 +115,7 @@ service { 'mysql':
   hasstatus => true,
   hasrestart => true,
   enable => true,
-  require => Package['mysql-server'],
+  require => Package['mysql-server']
 }
 
 exec { 'mysql-root-password':
@@ -125,9 +125,7 @@ exec { 'mysql-root-password':
 }
 
 exec { 'mysql-root-create-xhprof-db':
-	command => '/usr/bin/mysql -uroot -pvagrant -e "create database if not exists xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
   command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;"',
-	command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
   require => Exec['mysql-root-password'],
 }
 
@@ -152,40 +150,72 @@ package { 'redis-server':
 # ---------------------------------------------------
 # Install HHVM
 # ---------------------------------------------------
-
-package { 'hhvm-fastcgi':
-	ensure => installed,
-	require => Exec['apt-get update final'],
+package { 'hhvm':
+  ensure => installed,
+  require => Exec['apt-get update final'],
 }
 
 service { 'hhvm-fastcgi':
-	ensure => running,
-	hasstatus => true,
-	hasrestart => true,
-	enable => true,
-	require => Package["hhvm-fastcgi"],
+  ensure => running,
+  hasstatus => true,
+  hasrestart => true,
+  enable => true,
+  require => [
+    Package['hhvm'],
+    File['/var/log/hhvm'],
+    File['/var/run/hhvm'],
+    File['/etc/hhvm/server.hdf'],
+    File['/etc/default/hhvm-fastcgi'],
+    File['/etc/init.d/hhvm-fastcgi']
+  ],
 }
 
 file { '/etc/hhvm/server.hdf':
-	ensure => present,
-	source => "/vagrant/manifests/files/hhvm/server.hdf",
-	require => [
-		Package['hhvm-fastcgi'],
-	],
-	notify => Service['hhvm-fastcgi'],
+  ensure => file,
+  source => '/vagrant/manifests/files/hhvm/server.hdf',
+  owner  => 'root',
+  group  => 'root',
+  mode   => 0775,
+  require => Package['hhvm'],
+  notify => Service['hhvm-fastcgi']
 }
 
 file { '/etc/default/hhvm-fastcgi':
-	ensure => present,
-	source => "/vagrant/manifests/files/hhvm/default",
-	require => [
-		Package['hhvm-fastcgi'],
-	],
-	notify => Service['hhvm-fastcgi'],
+  ensure => file,
+  source => '/vagrant/manifests/files/hhvm/default',
+  owner  => 'root',
+  group  => 'root',
+  mode   => 0775,
+  require => Package['hhvm'],
+  notify => Service['hhvm-fastcgi']
+}
+
+file { '/etc/init.d/hhvm-fastcgi':
+  ensure => file,
+  source => '/vagrant/manifests/files/hhvm/init',
+  owner  => 'root',
+  group  => 'root',
+  mode   => 0775,
+  require => Package['hhvm'],
+  notify => Service['hhvm-fastcgi']
+}
+
+file { '/var/log/hhvm':
+  ensure => 'directory',
+  owner  => 'www-data',
+  group  => 'www-data',
+  mode   => 0755,
+}
+
+file { '/var/run/hhvm':
+  ensure => 'directory',
+  owner  => 'www-data',
+  group  => 'www-data',
+  mode   => 0755,
 }
 
 # ---------------------------------------------------
-# Install PHP 5.5.x with FPM & HHVM
+# Install PHP 5.5.x with FPM
 # ---------------------------------------------------
 package { 'php5-fpm':
   ensure => installed,
@@ -242,15 +272,9 @@ package { 'php5-xdebug':
 }
 
 exec { 'install_xhprof':
-	command => '/usr/bin/pecl install -f xhprof',
-	require => Package['php5-dev'],
   command => '/usr/bin/pecl install -f xhprof',
   require => Package['php5-dev'],
-	notify => Service['php5-fpm'],
   notify => Service['php5-fpm'],
-#	creates => '/usr/lib/php5/20121212/xhprof.so',
-#	unless => '/usr/bin/test -f /usr/lib/php5/20121212/xhprof.so'
-}
 }
 
 package { 'graphviz':
