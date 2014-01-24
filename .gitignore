@@ -2,3 +2,4 @@
 /.idea/
 /vHosts/t3-cms-*/
 /vHosts/*.sql
+/vHosts/index.php

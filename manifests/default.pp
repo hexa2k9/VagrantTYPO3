@@ -55,6 +55,12 @@ exec { 'Import repo signing key to apt keys 2':
   require => Exec['aptitude upgrade'],
 }
 
+exec { "Import repo signing key to apt keys 3":
+	path   => "/usr/bin:/usr/sbin:/bin",
+	command     => "wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -",
+	require => Exec['aptitude upgrade'],
+}
+
 exec { 'apt-get update':
   command => '/usr/bin/sudo apt-get update',
   require => Exec['aptitude upgrade'],
@@ -66,13 +72,24 @@ package { 'python-software-properties':
 }
 
 exec { 'adding new nginx':
-  command => '/usr/bin/sudo add-apt-repository -y "deb http://nginx.org/packages/ubuntu/ precise nginx"',
-  require => Package['python-software-properties']
+	command => '/usr/bin/sudo echo "deb http://nginx.org/packages/ubuntu/ precise nginx" > /etc/apt/sources.list.d/nginx.list',
+	creates => '/etc/apt/sources.list.d/nginx.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/nginx.list',
 }
 
 exec { 'adding ppa:ondrej/php5':
   command => '/usr/bin/sudo add-apt-repository -y ppa:ondrej/php5',
-  require => Package['python-software-properties']
+	creates => '/etc/apt/sources.list.d/ondrej-php5-precise.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/ondrej-php5-precise.list'
+}
+
+exec { 'adding hhvm sources.list':
+	command => '/usr/bin/sudo echo "deb http://dl.hhvm.com/ubuntu precise main" > /etc/apt/sources.list.d/hhvm.list',
+	creates => '/etc/apt/sources.list.d/hhvm.list',
+	require => Package['python-software-properties'],
+	unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
 }
 
 exec { 'apt-get update final':
@@ -81,6 +98,7 @@ exec { 'apt-get update final':
     Package['python-software-properties'],
     Exec['adding new nginx'],
     Exec['adding ppa:ondrej/php5']
+		Exec['adding hhvm sources.list'],
   ]
 }
 
@@ -107,7 +125,9 @@ exec { 'mysql-root-password':
 }
 
 exec { 'mysql-root-create-xhprof-db':
+	command => '/usr/bin/mysql -uroot -pvagrant -e "create database if not exists xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
   command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;"',
+	command => '/usr/bin/mysql -uroot -pvagrant -e "CREATE DATABASE IF NOT EXISTS xhprof CHARACTER SET utf8 COLLATE utf8_general_ci;" ',
   require => Exec['mysql-root-password'],
 }
 
@@ -130,7 +150,42 @@ package { 'redis-server':
 }
 
 # ---------------------------------------------------
-# Install PHP 5.5.x with FPM
+# Install HHVM
+# ---------------------------------------------------
+
+package { 'hhvm-fastcgi':
+	ensure => installed,
+	require => Exec['apt-get update final'],
+}
+
+service { 'hhvm-fastcgi':
+	ensure => running,
+	hasstatus => true,
+	hasrestart => true,
+	enable => true,
+	require => Package["hhvm-fastcgi"],
+}
+
+file { '/etc/hhvm/server.hdf':
+	ensure => present,
+	source => "/vagrant/manifests/files/hhvm/server.hdf",
+	require => [
+		Package['hhvm-fastcgi'],
+	],
+	notify => Service['hhvm-fastcgi'],
+}
+
+file { '/etc/default/hhvm-fastcgi':
+	ensure => present,
+	source => "/vagrant/manifests/files/hhvm/default",
+	require => [
+		Package['hhvm-fastcgi'],
+	],
+	notify => Service['hhvm-fastcgi'],
+}
+
+# ---------------------------------------------------
+# Install PHP 5.5.x with FPM & HHVM
 # ---------------------------------------------------
 package { 'php5-fpm':
   ensure => installed,
@@ -187,12 +242,18 @@ package { 'php5-xdebug':
 }
 
 exec { 'install_xhprof':
+	command => '/usr/bin/pecl install -f xhprof',
+	require => Package['php5-dev'],
   command => '/usr/bin/pecl install -f xhprof',
   require => Package['php5-dev'],
+	notify => Service['php5-fpm'],
   notify => Service['php5-fpm'],
+#	creates => '/usr/lib/php5/20121212/xhprof.so',
+#	unless => '/usr/bin/test -f /usr/lib/php5/20121212/xhprof.so'
+}
 }
 
-package { ['graphviz']:
+package { 'graphviz':
   ensure  => installed,
   notify  => Service['php5-fpm'],
 }
