@@ -26,6 +26,11 @@ package { 'nano':
   require => Exec['aptitude upgrade'],
 }
 
+package { 'vim':
+  ensure => present,
+  require => Exec['aptitude upgrade'],
+}
+
 package { 'git':
   ensure => present,
   require => Exec['aptitude upgrade'],
