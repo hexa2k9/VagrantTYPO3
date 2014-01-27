@@ -344,6 +344,13 @@ file { '/etc/nginx/nginx.conf':
   notify => Service['nginx']
 }
 
+file { '/etc/nginx/mime.types':
+  ensure => present,
+  source => '/vagrant/manifests/files/nginx/mime.types',
+  require => Package['nginx'],
+  notify => Service['nginx']
+}
+
 service { 'nginx':
   ensure => running,
   hasstatus => true,
