@@ -85,11 +85,18 @@ exec { 'adding ppa:ondrej/php5':
   unless => '/usr/bin/test -f /etc/apt/sources.list.d/ondrej-php5-precise.list'
 }
 
+exec { 'adding ppa:chris-lea/redis-server':
+  command => '/usr/bin/sudo add-apt-repository -y ppa:chris-lea/redis-server',
+  creates => '/etc/apt/sources.list.d/chris-lea-redis-server-precise.list',
+  require => Package['python-software-properties'],
+  unless => '/usr/bin/test -f /etc/apt/sources.list.d/chris-lea-redis-server-precise.list'
+}
+
 exec { 'adding hhvm sources.list':
   command => '/usr/bin/sudo echo "deb http://dl.hhvm.com/ubuntu precise main" > /etc/apt/sources.list.d/hhvm.list',
   require => Package['python-software-properties'],
-#  creates => '/etc/apt/sources.list.d/hhvm.list',
-#  unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
+  creates => '/etc/apt/sources.list.d/hhvm.list',
+  unless => '/usr/bin/test -f /etc/apt/sources.list.d/hhvm.list'
 }
 
 exec { 'apt-get update final':
@@ -98,6 +105,7 @@ exec { 'apt-get update final':
     Package['python-software-properties'],
     Exec['adding new nginx'],
     Exec['adding ppa:ondrej/php5'],
+    Exec['adding ppa:chris-lea/redis-server'],
     Exec['adding hhvm sources.list']
   ]
 }
