@@ -117,7 +117,6 @@ exec { 'mysql-root-import-xhprof-db':
 # ---------------------------------------------------
 # Install Cache Servers
 # ---------------------------------------------------
-
 package { 'memcached':
 	ensure => installed,
 	require => Exec['apt-get update final'],
@@ -234,7 +233,6 @@ file { '/etc/php5/cli/conf.d/90-vagrant.ini':
 # ---------------------------------------------------
 # Install Composer
 # ---------------------------------------------------
-
 exec { 'install-composer':
 	command => 'curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer',
 	path => "/usr/local/bin/:/usr/bin/:/bin/",
@@ -254,6 +252,16 @@ exec { 'selfupdate-composer':
 	],
 }
 
+exec { 'install-phpunit':
+	command => 'sudo curl -o /usr/local/bin/phpunit https://phar.phpunit.de/phpunit.phar && sudo chmod +x /usr/local/bin/phpunit',
+	path => '/usr/local/bin/:/usr/bin/',
+	timeout => 0,
+	creates => '/usr/local/bin/phpunit',
+	require => [
+		Package['curl'],
+		Package['php5-cli'],
+	],
+}
 
 
 # ---------------------------------------------------
