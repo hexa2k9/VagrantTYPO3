@@ -330,6 +330,20 @@ exec { 'selfupdate-composer':
 }
 
 # ---------------------------------------------------
+# Install PHP Unit
+# ---------------------------------------------------
+exec { 'install-phpunit':
+  command => 'sudo curl -o /usr/local/bin/phpunit https://phar.phpunit.de/phpunit.phar && sudo chmod +x /usr/local/bin/phpunit',
+  path => '/usr/local/bin/:/usr/bin/',
+  timeout => 0,
+  creates => '/usr/local/bin/phpunit',
+  require => [
+    Package['curl'],
+    Package['php5-cli']
+  ]
+}
+
+# ---------------------------------------------------
 # Install Nginx
 # ---------------------------------------------------
 package { 'nginx':
