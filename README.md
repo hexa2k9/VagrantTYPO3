@@ -42,6 +42,8 @@ Boot up the virtual box:
 
 	vagrant up
 
+If you are using a Mac you have to enter the root passwort of you Mac while the boot up. This is caused by the nfs mounting that requires root access.
+
 The box gets one static IP addresses **192.168.50.50** which is only accessible from your local computer.
 
 Now add any project you're working on (e.g. "example.com") to your hosts file and let it point to 192.168.50.50 and create a directory with the domain name within the sub-directory "vHosts". As soon as you call that domain from your browser, you should see it working.
